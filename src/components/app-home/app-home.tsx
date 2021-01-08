@@ -1,4 +1,4 @@
-import { popoverController } from '@ionic/core';
+import { alertController, popoverController } from '@ionic/core';
 import { Component, ComponentInterface, h, Host } from '@stencil/core';
 import '@vanillawc/wc-monaco-editor';
 
@@ -44,6 +44,10 @@ export class AppHome implements ComponentInterface {
   }
 
   componentDidLoad() {
+    window.addEventListener('beforeunload', event => {
+      const message = 'You have unsaved changes, are you really sure to close the document?';
+      event.returnValue = message;
+    });
     (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
   }
 
@@ -86,10 +90,12 @@ export class AppHome implements ComponentInterface {
     await popover.present();
   }
 
-  private createNew() {
-    this.fileHandle = undefined;
-    this.editorContent = '';
-    this.isAnyChangePending = false;
+  private async createNew() {
+    await this.alertIfAnyPendingChange(() => {
+      this.fileHandle = undefined;
+      this.editorContent = '';
+      this.isAnyChangePending = false;
+    });
   }
 
   private async saveFile(saveAs?: boolean) {
@@ -112,10 +118,12 @@ export class AppHome implements ComponentInterface {
   }
 
   private async openFile() {
-    [this.fileHandle] = await (window as any).showOpenFilePicker();
-    const content = await this.readFile();
-    this.loadContentToEditor(content);
-    this.isAnyChangePending = false;
+    await this.alertIfAnyPendingChange(async () => {
+      [this.fileHandle] = await (window as any).showOpenFilePicker();
+      const content = await this.readFile();
+      this.loadContentToEditor(content);
+      this.isAnyChangePending = false;
+    });
   }
 
   private async readFile() {
@@ -125,6 +133,28 @@ export class AppHome implements ComponentInterface {
 
   private loadContentToEditor(content: string) {
     this.editorContent = content;
+  }
+
+  private async alertIfAnyPendingChange(continueHandler: () => void, cancelHandler?: () => void) {
+    if (this.isAnyChangePending) {
+      const alert = await alertController.create({
+        header: 'You have unsaved changes',
+        message: 'Do you really want to close current document without saving the changes?',
+        buttons: [
+          {
+            text: 'No',
+            handler: cancelHandler
+          },
+          {
+            text: 'Yes',
+            handler: continueHandler
+          }
+        ]
+      });
+      await alert.present();
+    } else {
+      continueHandler();
+    }
   }
 
   private updateAppTitle() {
