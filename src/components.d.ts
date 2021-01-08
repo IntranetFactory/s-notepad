@@ -7,6 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface AppFileMenu {
+        "newFileHandler": () => void;
         "openFileHandler": () => void;
         "popoverId": string;
         "saveFileAsHandler": () => void;
@@ -44,6 +45,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface AppFileMenu {
+        "newFileHandler"?: () => void;
         "openFileHandler"?: () => void;
         "popoverId"?: string;
         "saveFileAsHandler"?: () => void;

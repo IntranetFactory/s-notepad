@@ -61,12 +61,18 @@ export class AppHome implements ComponentInterface {
       event: event,
       translucent: true,
       componentProps: {
+        newFileHandler: () => this.createNew(),
         openFileHandler: () => this.openFile(),
         saveFileHandler: () => this.saveFile(),
         saveFileAsHandler: () => this.saveFile(true)
       }
     });
     await popover.present();
+  }
+
+  private createNew() {
+    this.fileHandle = undefined;
+    this.editorContent = '';
   }
 
   private async saveFile(saveAs?: boolean) {

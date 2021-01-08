@@ -9,6 +9,7 @@ import { Component, Host, h, Prop } from '@stencil/core';
 export class AppFileMenu {
 
   @Prop() popoverId: string;
+  @Prop() newFileHandler: () => void;
   @Prop() openFileHandler: () => void;
   @Prop() saveFileHandler: () => void;
   @Prop() saveFileAsHandler: () => void;
@@ -18,6 +19,16 @@ export class AppFileMenu {
       <Host>
         <ion-content>
           <ion-list>
+            <ion-item
+              button
+              onClick={() => {
+                this.newFileHandler();
+                this.dismissPopover();
+              }}
+            >
+              <ion-icon slot="start" name="create"></ion-icon>
+              <ion-label>New</ion-label>
+            </ion-item>
             <ion-item
               button
               onClick={() => {
