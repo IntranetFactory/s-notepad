@@ -7,7 +7,6 @@ export const config: Config = {
   globalStyle: 'src/global/app.css',
   taskQueue: 'async',
   outputTargets: [{
-    type: 'www',
-    serviceWorker: null
+    type: 'www'
   }],
 };
