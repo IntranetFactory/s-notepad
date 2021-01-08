@@ -10,7 +10,19 @@ import '@vanillawc/wc-monaco-editor';
 export class AppHome implements ComponentInterface {
 
   private monacoEditorElement: HTMLElement;
-  private fileHandle: any;
+
+  private _fileHandle: any;
+  private get fileHandle() {
+    return this._fileHandle;
+  }
+  private set fileHandle(value: any) {
+    this._fileHandle = value;
+    if (value) {
+      document.title = `${value.name} - SNotepad`
+    } else {
+      document.title = 'SNotepad';
+    }
+  }
 
   private get editorContent() {
     return (this.monacoEditorElement as any).value;
