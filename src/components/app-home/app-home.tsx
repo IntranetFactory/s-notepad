@@ -9,7 +9,23 @@ import '@vanillawc/wc-monaco-editor';
 })
 export class AppHome implements ComponentInterface {
 
-  private monacoEditorElement: HTMLElement;
+  private _isAnyChangePending: boolean = false;
+  private get isAnyChangePending() {
+    return this._isAnyChangePending;
+  }
+  private set isAnyChangePending(value: boolean) {
+    this._isAnyChangePending = value;
+    this.updateAppTitle();
+  }
+
+  private _monacoEditorElement: HTMLElement;
+
+  private get monacoEditorElement() {
+    return this._monacoEditorElement;
+  }
+  private set monacoEditorElement(value: HTMLElement) {
+    this._monacoEditorElement = value;
+  }
 
   private _fileHandle: any;
   private get fileHandle() {
@@ -17,11 +33,7 @@ export class AppHome implements ComponentInterface {
   }
   private set fileHandle(value: any) {
     this._fileHandle = value;
-    if (value) {
-      document.title = `${value.name} - SNotepad`
-    } else {
-      document.title = 'SNotepad';
-    }
+    this.updateAppTitle();
   }
 
   private get editorContent() {
@@ -29,6 +41,10 @@ export class AppHome implements ComponentInterface {
   }
   private set editorContent(value: string) {
     (this.monacoEditorElement as any).value = value;
+  }
+
+  componentDidLoad() {
+    (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
   }
 
   render() {
@@ -73,6 +89,7 @@ export class AppHome implements ComponentInterface {
   private createNew() {
     this.fileHandle = undefined;
     this.editorContent = '';
+    this.isAnyChangePending = false;
   }
 
   private async saveFile(saveAs?: boolean) {
@@ -91,12 +108,14 @@ export class AppHome implements ComponentInterface {
     const writableStream = await this.fileHandle.createWritable();
     await writableStream.write(this.editorContent);
     await writableStream.close();
+    this.isAnyChangePending = false;
   }
 
   private async openFile() {
     [this.fileHandle] = await (window as any).showOpenFilePicker();
     const content = await this.readFile();
     this.loadContentToEditor(content);
+    this.isAnyChangePending = false;
   }
 
   private async readFile() {
@@ -106,6 +125,14 @@ export class AppHome implements ComponentInterface {
 
   private loadContentToEditor(content: string) {
     this.editorContent = content;
+  }
+
+  private updateAppTitle() {
+    if (this.fileHandle) {
+      document.title = `${this.fileHandle.name}${this.isAnyChangePending ? '*' : ''} - SNotepad`;
+    } else {
+      document.title = `${this.isAnyChangePending ? '* - ' : ''}SNotepad`;
+    }
   }
 
 }
