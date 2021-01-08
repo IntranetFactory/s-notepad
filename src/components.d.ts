@@ -9,6 +9,7 @@ export namespace Components {
     interface AppFileMenu {
         "openFileHandler": () => void;
         "popoverId": string;
+        "saveFileAsHandler": () => void;
         "saveFileHandler": () => void;
     }
     interface AppHome {
@@ -45,6 +46,7 @@ declare namespace LocalJSX {
     interface AppFileMenu {
         "openFileHandler"?: () => void;
         "popoverId"?: string;
+        "saveFileAsHandler"?: () => void;
         "saveFileHandler"?: () => void;
     }
     interface AppHome {

@@ -62,14 +62,15 @@ export class AppHome implements ComponentInterface {
       translucent: true,
       componentProps: {
         openFileHandler: () => this.openFile(),
-        saveFileHandler: () => this.saveFile()
+        saveFileHandler: () => this.saveFile(),
+        saveFileAsHandler: () => this.saveFile(true)
       }
     });
     await popover.present();
   }
 
-  private async saveFile() {
-    if (!this.fileHandle) {
+  private async saveFile(saveAs?: boolean) {
+    if (!this.fileHandle || saveAs) {
       this.fileHandle = await (window as any).showSaveFilePicker({
         types: [
           {
