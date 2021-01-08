@@ -17,5 +17,8 @@
   "devDependencies": {
     "@ionic/core": "^5.3.2",
     "@stencil/core": "^2.0.1"
+  },
+  "dependencies": {
+    "@vanillawc/wc-monaco-editor": "^1.10.12"
   }
 }
