@@ -1,6 +1,7 @@
 import { alertController, popoverController } from '@ionic/core';
 import { Component, ComponentInterface, h, Host } from '@stencil/core';
 import '@vanillawc/wc-monaco-editor';
+import mousetrap from 'mousetrap';
 
 @Component({
   tag: 'app-home',
@@ -51,6 +52,8 @@ export class AppHome implements ComponentInterface {
       }
     });
     (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
+
+    this.addKeyboardShortcuts();
   }
 
   render() {
@@ -172,6 +175,20 @@ export class AppHome implements ComponentInterface {
     } else {
       document.title = `${this.isAnyChangePending ? '* - ' : ''}SNotepad`;
     }
+  }
+
+  private addKeyboardShortcuts() {
+    const executeAction = (event: mousetrap.ExtendedKeyboardEvent, shortcutHandler: () => void) => {
+      event.preventDefault();
+      shortcutHandler();
+    };
+
+    mousetrap.bind(['ctrl+n', 'command+n'], event => executeAction(event, () => this.createNew()));
+    mousetrap.bind(['ctrl+o', 'command+o'], event => executeAction(event, () => this.openFile()));
+    mousetrap.bind(['ctrl+s', 'command+s'], event => executeAction(event, () => this.saveFile()));
+    mousetrap.bind(['ctrl+shift+s', 'command+shift+s'], event => executeAction(event, () => this.saveFile(true)));
+
+    mousetrap.prototype.stopCallback = () => false;
   }
 
 }
