@@ -22,8 +22,8 @@ export class AppHome implements ComponentInterface {
     return (
       <Host>
         <ion-header>
-          <ion-toolbar color="dark">
-            <ion-buttons>
+          <ion-toolbar>
+            <ion-buttons slot="start">
               <ion-button onClick={() => this.openFile()}>
                 <ion-icon name="open" slot="start"></ion-icon>
                 <ion-label>Open</ion-label>

@@ -1,10 +1,15 @@
-import { Component, h } from '@stencil/core';
+import { Component, ComponentInterface, h } from '@stencil/core';
 
 @Component({
   tag: 'app-root',
   styleUrl: 'app-root.css',
 })
-export class AppRoot {
+export class AppRoot implements ComponentInterface {
+
+  connectedCallback() {
+    document.body.classList.toggle('dark', true);
+  }
+
   render() {
     return (
       <ion-app>
@@ -15,4 +20,5 @@ export class AppRoot {
       </ion-app>
     );
   }
+
 }
