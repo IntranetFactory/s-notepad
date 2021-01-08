@@ -45,8 +45,10 @@ export class AppHome implements ComponentInterface {
 
   componentDidLoad() {
     window.addEventListener('beforeunload', event => {
-      const message = 'You have unsaved changes, are you really sure to close the document?';
-      event.returnValue = message;
+      if (this.isAnyChangePending) {
+        const message = 'You have unsaved changes, are you really sure to close the document?';
+        event.returnValue = message;
+      }
     });
     (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
   }
