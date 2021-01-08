@@ -84,10 +84,17 @@ export class AppHome implements ComponentInterface {
         newFileHandler: () => this.createNew(),
         openFileHandler: () => this.openFile(),
         saveFileHandler: () => this.saveFile(),
-        saveFileAsHandler: () => this.saveFile(true)
+        saveFileAsHandler: () => this.saveFile(true),
+        exitHandler: () => this.exit()
       }
     });
     await popover.present();
+  }
+
+  private async exit() {
+    await this.alertIfAnyPendingChange(() => {
+      window.close();
+    });
   }
 
   private async createNew() {

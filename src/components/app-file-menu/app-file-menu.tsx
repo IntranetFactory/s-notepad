@@ -13,6 +13,7 @@ export class AppFileMenu {
   @Prop() openFileHandler: () => void;
   @Prop() saveFileHandler: () => void;
   @Prop() saveFileAsHandler: () => void;
+  @Prop() exitHandler: () => void;
 
   render() {
     return (
@@ -58,6 +59,16 @@ export class AppFileMenu {
             >
               <ion-icon slot="start" name="save"></ion-icon>
               <ion-label>Save As</ion-label>
+            </ion-item>
+            <ion-item
+              button
+              onClick={() => {
+                this.exitHandler();
+                this.dismissPopover();
+              }}
+            >
+              <ion-icon slot="start" name="exit"></ion-icon>
+              <ion-label>Exit</ion-label>
             </ion-item>
           </ion-list>
         </ion-content>
