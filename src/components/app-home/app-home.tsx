@@ -1,3 +1,4 @@
+import { popoverController } from '@ionic/core';
 import { Component, ComponentInterface, h, Host } from '@stencil/core';
 import '@vanillawc/wc-monaco-editor';
 
@@ -24,13 +25,9 @@ export class AppHome implements ComponentInterface {
         <ion-header>
           <ion-toolbar>
             <ion-buttons slot="start">
-              <ion-button onClick={() => this.openFile()}>
-                <ion-icon name="open" slot="start"></ion-icon>
-                <ion-label>Open</ion-label>
-              </ion-button>
-              <ion-button onClick={() => this.saveFile()}>
-                <ion-icon name="save" slot="start"></ion-icon>
-                <ion-label>Save</ion-label>
+              <ion-button onClick={event => this.showFileMenu(event)}>
+                <ion-icon name="document" slot="start"></ion-icon>
+                <ion-label>File</ion-label>
               </ion-button>
             </ion-buttons>
           </ion-toolbar>
@@ -43,6 +40,20 @@ export class AppHome implements ComponentInterface {
         </ion-content>
       </Host >
     );
+  }
+
+  private async showFileMenu(event: MouseEvent) {
+    const popover = await popoverController.create({
+      id: 'file-menu',
+      component: 'app-file-menu',
+      event: event,
+      translucent: true,
+      componentProps: {
+        openFileHandler: () => this.openFile(),
+        saveFileHandler: () => this.saveFile()
+      }
+    });
+    await popover.present();
   }
 
   private async saveFile() {

@@ -6,12 +6,23 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface AppFileMenu {
+        "openFileHandler": () => void;
+        "popoverId": string;
+        "saveFileHandler": () => void;
+    }
     interface AppHome {
     }
     interface AppRoot {
     }
 }
 declare global {
+    interface HTMLAppFileMenuElement extends Components.AppFileMenu, HTMLStencilElement {
+    }
+    var HTMLAppFileMenuElement: {
+        prototype: HTMLAppFileMenuElement;
+        new (): HTMLAppFileMenuElement;
+    };
     interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
     }
     var HTMLAppHomeElement: {
@@ -25,16 +36,23 @@ declare global {
         new (): HTMLAppRootElement;
     };
     interface HTMLElementTagNameMap {
+        "app-file-menu": HTMLAppFileMenuElement;
         "app-home": HTMLAppHomeElement;
         "app-root": HTMLAppRootElement;
     }
 }
 declare namespace LocalJSX {
+    interface AppFileMenu {
+        "openFileHandler"?: () => void;
+        "popoverId"?: string;
+        "saveFileHandler"?: () => void;
+    }
     interface AppHome {
     }
     interface AppRoot {
     }
     interface IntrinsicElements {
+        "app-file-menu": AppFileMenu;
         "app-home": AppHome;
         "app-root": AppRoot;
     }
@@ -43,6 +61,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "app-file-menu": LocalJSX.AppFileMenu & JSXBase.HTMLAttributes<HTMLAppFileMenuElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
         }
