@@ -1,6 +1,7 @@
 import { alertController, popoverController } from '@ionic/core';
-import { Component, ComponentInterface, h, Host } from '@stencil/core';
+import { Component, ComponentInterface, h, Host, Prop } from '@stencil/core';
 import mousetrap from 'mousetrap';
+import pako from 'pako';
 
 @Component({
   tag: 'app-home',
@@ -19,7 +20,6 @@ export class AppHome implements ComponentInterface {
   }
 
   private _monacoEditorElement: HTMLElement;
-
   private get monacoEditorElement() {
     return this._monacoEditorElement;
   }
@@ -43,6 +43,12 @@ export class AppHome implements ComponentInterface {
     (this.monacoEditorElement as any).value = value;
   }
 
+  private get baseUrl() {
+    return window.location.origin.replace(window.location.hash, '');
+  }
+
+  @Prop() sharedContentBase64: string;
+
   componentDidLoad() {
     window.addEventListener('beforeunload', event => {
       if (this.isAnyChangePending) {
@@ -50,7 +56,16 @@ export class AppHome implements ComponentInterface {
         event.returnValue = message;
       }
     });
-    (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
+
+    // TODO find out a way that do not need to use setTimeout
+    setTimeout(() => {
+      if (this.sharedContentBase64) {
+        const encodedBuffer = this.base64ToBuffer(this.sharedContentBase64.replace(/-/g, '/'));
+        const inflatedBuffer = pako.inflate(encodedBuffer);
+        this.editorContent = new TextDecoder('utf8').decode(inflatedBuffer);
+      }
+      (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
+    }, 500);
 
     this.addKeyboardShortcuts();
   }
@@ -64,6 +79,14 @@ export class AppHome implements ComponentInterface {
               <ion-button onClick={event => this.showFileMenu(event)}>
                 <ion-icon name="document" slot="start"></ion-icon>
                 <ion-label>File</ion-label>
+              </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end">
+              <ion-button
+                title="Share a snapshot"
+                onClick={() => this.shareSnapshot()}
+              >
+                <ion-icon slot="icon-only" name="share"></ion-icon>
               </ion-button>
             </ion-buttons>
           </ion-toolbar>
@@ -95,6 +118,16 @@ export class AppHome implements ComponentInterface {
         </ion-content>
       </Host >
     );
+  }
+
+  private shareSnapshot() {
+    const deflatedText = pako.deflate(new TextEncoder().encode(this.editorContent));
+    const base64String = this.bufferToBase64(deflatedText);
+    navigator.share({
+      title: document.title,
+      text: document.title,
+      url: `${this.baseUrl}#/share/${base64String}`
+    });
   }
 
   private async showFileMenu(event: MouseEvent) {
@@ -207,6 +240,22 @@ export class AppHome implements ComponentInterface {
     mousetrap.bind(['ctrl+shift+s', 'command+shift+s'], event => executeAction(event, () => this.saveFile(true)));
 
     mousetrap.prototype.stopCallback = () => false;
+  }
+
+  private bufferToBase64(buffer: Uint8Array) {
+    var binstr = Array.prototype.map.call(buffer, function (character) {
+      return String.fromCharCode(character);
+    }).join('');
+    return btoa(binstr);
+  }
+
+  private base64ToBuffer(base64: string) {
+    var binstr = atob(base64);
+    var buffer = new Uint8Array(binstr.length);
+    Array.prototype.forEach.call(binstr, function (character, i) {
+      buffer[i] = character.charCodeAt(0);
+    });
+    return buffer;
   }
 
 }

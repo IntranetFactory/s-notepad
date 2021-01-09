@@ -15,6 +15,7 @@ export namespace Components {
         "saveFileHandler": () => void;
     }
     interface AppHome {
+        "sharedContentBase64": string;
     }
     interface AppRoot {
     }
@@ -54,6 +55,7 @@ declare namespace LocalJSX {
         "saveFileHandler"?: () => void;
     }
     interface AppHome {
+        "sharedContentBase64"?: string;
     }
     interface AppRoot {
     }
