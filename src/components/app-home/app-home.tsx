@@ -60,6 +60,7 @@ export class AppHome implements ComponentInterface {
     // TODO find out a way that do not need to use setTimeout
     setTimeout(() => {
       if (this.sharedContentBase64) {
+        debugger
         const encodedBuffer = this.base64ToBuffer(this.sharedContentBase64.replace(/-/g, '/'));
         const inflatedBuffer = pako.inflate(encodedBuffer);
         this.editorContent = new TextDecoder('utf8').decode(inflatedBuffer);
@@ -131,7 +132,7 @@ export class AppHome implements ComponentInterface {
 
   private async shareSnapshot() {
     const deflatedText = pako.deflate(new TextEncoder().encode(this.editorContent));
-    const base64String = this.bufferToBase64(deflatedText);
+    const base64String = this.bufferToBase64(deflatedText).replace(/\//g, '-');
     if (navigator.share) {
       navigator.share({
         title: document.title,
