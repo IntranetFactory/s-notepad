@@ -149,7 +149,7 @@ export class AppHome implements ComponentInterface {
 
   private async openFile(fileHandle?: any) {
     await this.alertIfAnyPendingChange(async () => {
-      this.fileHandle = fileHandle || await (window as any).showOpenFilePicker()?.[0];
+      this.fileHandle = fileHandle || (await (window as any).showOpenFilePicker())?.[0];
       const content = await this.readFile();
       this.loadContentToEditor(content);
       this.isAnyChangePending = false;
