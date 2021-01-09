@@ -75,7 +75,7 @@ export class AppHome implements ComponentInterface {
         });
       }
       (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
-    }, 500);
+    }, 1000);
 
     this.addKeyboardShortcuts();
   }
