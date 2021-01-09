@@ -129,14 +129,28 @@ export class AppHome implements ComponentInterface {
     );
   }
 
-  private shareSnapshot() {
+  private async shareSnapshot() {
     const deflatedText = pako.deflate(new TextEncoder().encode(this.editorContent));
     const base64String = this.bufferToBase64(deflatedText);
-    navigator.share({
-      title: document.title,
-      text: document.title,
-      url: `${this.baseUrl}#/share/${base64String}`
-    });
+    if (navigator.share) {
+      navigator.share({
+        title: document.title,
+        text: document.title,
+        url: `${this.baseUrl}#/share/${base64String}`
+      });
+    } else {
+      const alert = await alertController.create({
+        header: 'You can copy the link and share it.',
+        inputs: [
+          {
+            type: 'text',
+            value: `${this.baseUrl}#/share/${base64String}`
+          }
+        ],
+        buttons: ['OK']
+      });
+      await alert.present();
+    }
   }
 
   private async showFileMenu(event: MouseEvent) {
