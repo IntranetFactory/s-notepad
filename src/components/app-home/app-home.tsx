@@ -1,6 +1,5 @@
 import { alertController, popoverController } from '@ionic/core';
 import { Component, ComponentInterface, h, Host } from '@stencil/core';
-import '@vanillawc/wc-monaco-editor';
 import mousetrap from 'mousetrap';
 
 @Component({
