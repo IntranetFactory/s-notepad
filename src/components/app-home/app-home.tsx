@@ -64,6 +64,15 @@ export class AppHome implements ComponentInterface {
         const inflatedBuffer = pako.inflate(encodedBuffer);
         this.editorContent = new TextDecoder('utf8').decode(inflatedBuffer);
       }
+      if ('launchQueue' in window) {
+        window['launchQueue'].setConsumer((launchParams) => {
+          if (launchParams.files?.length > 0) {
+            for (const fileHandle of launchParams.files) {
+              this.openFile(fileHandle);
+            }
+          }
+        });
+      }
       (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
     }, 500);
 
