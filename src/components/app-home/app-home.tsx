@@ -72,6 +72,25 @@ export class AppHome implements ComponentInterface {
         <ion-content scrollY={false}>
           <wc-monaco-editor
             ref={el => this.monacoEditorElement = el}
+            onDragover={event => event.preventDefault()}
+            onDrop={async event => {
+              event.preventDefault();
+              for (const item of event.dataTransfer.items) {
+                if (item.kind === 'file') {
+                  const fileHandle = await item.getAsFileSystemHandle();
+                  if (fileHandle.kind === 'file') {
+                    await this.openFile(fileHandle);
+                  } else {
+                    const alert = await alertController.create({
+                      header: 'Unsupported Type',
+                      message: 'Opening a direcotory is not supported.',
+                      buttons: ['OK']
+                    });
+                    await alert.present();
+                  }
+                }
+              }
+            }}
           ></wc-monaco-editor>
         </ion-content>
       </Host >
@@ -128,9 +147,9 @@ export class AppHome implements ComponentInterface {
     this.isAnyChangePending = false;
   }
 
-  private async openFile() {
+  private async openFile(fileHandle?: any) {
     await this.alertIfAnyPendingChange(async () => {
-      [this.fileHandle] = await (window as any).showOpenFilePicker();
+      this.fileHandle = fileHandle || await (window as any).showOpenFilePicker()?.[0];
       const content = await this.readFile();
       this.loadContentToEditor(content);
       this.isAnyChangePending = false;
