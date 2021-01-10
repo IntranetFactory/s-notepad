@@ -15,7 +15,7 @@ export class AppRoot implements ComponentInterface {
       <ion-app>
         <ion-router useHash={true}>
           <ion-route url="/" component="app-home" />
-          <ion-route url="/share/:sharedContentBase64" component="app-home" />
+          <ion-route url="/snapshot/:sharedContentBase64" component="app-home" />
         </ion-router>
         <ion-nav />
       </ion-app>

@@ -137,7 +137,7 @@ export class AppHome implements ComponentInterface {
       navigator.share({
         title: document.title,
         text: document.title,
-        url: `${this.baseUrl}#/share/${base64String}`
+        url: `${this.baseUrl}#/snapshot/${base64String}`
       });
     } else {
       const alert = await alertController.create({
@@ -145,7 +145,7 @@ export class AppHome implements ComponentInterface {
         inputs: [
           {
             type: 'text',
-            value: `${this.baseUrl}#/share/${base64String}`
+            value: `${this.baseUrl}#/snapshot/${base64String}`
           }
         ],
         buttons: ['OK']
