@@ -1,5 +1,6 @@
 import { alertController, popoverController } from '@ionic/core';
 import { Component, ComponentInterface, h, Host, Prop, State } from '@stencil/core';
+import { languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
 import pako from 'pako';
 
@@ -19,13 +20,7 @@ export class AppHome implements ComponentInterface {
     this.updateAppTitle();
   }
 
-  private _monacoEditorElement: HTMLElement;
-  private get monacoEditorElement() {
-    return this._monacoEditorElement;
-  }
-  private set monacoEditorElement(value: HTMLElement) {
-    this._monacoEditorElement = value;
-  }
+  private monacoEditorElement: HTMLAppMonacoEditorElement;
 
   private _fileHandle: any;
   private get fileHandle() {
@@ -40,9 +35,10 @@ export class AppHome implements ComponentInterface {
     return window.location.origin.replace(window.location.hash, '');
   }
 
-  @State() editorLanguage: string;
   @State() editorValue: string;
+  @State() editorLanguages: languages.ILanguageExtensionPoint[];
 
+  @Prop({ mutable: true }) editorLanguage: string = 'plaintext';
   @Prop() sharedContentBase64: string;
 
   async componentDidLoad() {
@@ -68,6 +64,8 @@ export class AppHome implements ComponentInterface {
       });
     }
 
+    this.editorLanguages = await this.monacoEditorElement.getEditorLanguages();
+
     this.addKeyboardShortcuts();
   }
 
@@ -82,6 +80,19 @@ export class AppHome implements ComponentInterface {
                 <ion-label>File</ion-label>
               </ion-button>
             </ion-buttons>
+            <ion-select
+              slot="end"
+              interface="popover"
+              value={this.editorLanguage}
+              placeholder="Content Format"
+              onIonChange={({ detail }) => this.editorLanguage = detail.value}
+            >
+              {
+                this.editorLanguages?.map(language =>
+                  <ion-select-option value={language.id}>{language.aliases[0]}</ion-select-option>
+                )
+              }
+            </ion-select>
             <ion-buttons slot="end">
               <ion-button
                 title="Share a snapshot"
@@ -130,11 +141,12 @@ export class AppHome implements ComponentInterface {
   private async shareSnapshot() {
     const deflatedText = pako.deflate(new TextEncoder().encode(this.editorValue));
     const base64String = this.bufferToBase64(deflatedText).replace(/\//g, '-');
+    const url = `${this.baseUrl}#/snapshot/${this.editorLanguage || 'plaintext'}/${base64String}`;
     if (navigator.share) {
       navigator.share({
         title: document.title,
         text: document.title,
-        url: `${this.baseUrl}#/snapshot/${base64String}`
+        url
       });
     } else {
       const alert = await alertController.create({
@@ -142,7 +154,7 @@ export class AppHome implements ComponentInterface {
         inputs: [
           {
             type: 'text',
-            value: `${this.baseUrl}#/snapshot/${base64String}`
+            value: url
           }
         ],
         buttons: ['OK']

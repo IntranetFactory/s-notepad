@@ -1,6 +1,6 @@
-import { Component, Host, h, ComponentInterface, Prop, Event, EventEmitter } from '@stencil/core';
+import { Component, Host, h, ComponentInterface, Prop, Event, EventEmitter, Method } from '@stencil/core';
 import monacoLoader, { Monaco } from '@monaco-editor/loader';
-import { editor } from 'monaco-editor';
+import { editor, languages } from 'monaco-editor';
 
 @Component({
   tag: 'app-monaco-editor',
@@ -53,6 +53,11 @@ export class AppMonacoEditor implements ComponentInterface {
         break;
     }
     return false;
+  }
+
+  @Method()
+  async getEditorLanguages() {
+    return this.monaco.languages.getLanguages() as languages.ILanguageExtensionPoint[];
   }
 
   render() {
