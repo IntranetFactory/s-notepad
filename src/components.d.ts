@@ -5,6 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { editor } from "monaco-editor";
 export namespace Components {
     interface AppFileMenu {
         "exitHandler": () => void;
@@ -16,6 +17,11 @@ export namespace Components {
     }
     interface AppHome {
         "sharedContentBase64": string;
+    }
+    interface AppMonacoEditor {
+        "language": string;
+        "theme": string;
+        "value": string;
     }
     interface AppRoot {
     }
@@ -33,6 +39,12 @@ declare global {
         prototype: HTMLAppHomeElement;
         new (): HTMLAppHomeElement;
     };
+    interface HTMLAppMonacoEditorElement extends Components.AppMonacoEditor, HTMLStencilElement {
+    }
+    var HTMLAppMonacoEditorElement: {
+        prototype: HTMLAppMonacoEditorElement;
+        new (): HTMLAppMonacoEditorElement;
+    };
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
     var HTMLAppRootElement: {
@@ -42,6 +54,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "app-file-menu": HTMLAppFileMenuElement;
         "app-home": HTMLAppHomeElement;
+        "app-monaco-editor": HTMLAppMonacoEditorElement;
         "app-root": HTMLAppRootElement;
     }
 }
@@ -57,11 +70,18 @@ declare namespace LocalJSX {
     interface AppHome {
         "sharedContentBase64"?: string;
     }
+    interface AppMonacoEditor {
+        "language"?: string;
+        "onDidChangeModelContent"?: (event: CustomEvent<editor.IModelContentChangedEvent>) => void;
+        "theme"?: string;
+        "value"?: string;
+    }
     interface AppRoot {
     }
     interface IntrinsicElements {
         "app-file-menu": AppFileMenu;
         "app-home": AppHome;
+        "app-monaco-editor": AppMonacoEditor;
         "app-root": AppRoot;
     }
 }
@@ -71,6 +91,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "app-file-menu": LocalJSX.AppFileMenu & JSXBase.HTMLAttributes<HTMLAppFileMenuElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
+            "app-monaco-editor": LocalJSX.AppMonacoEditor & JSXBase.HTMLAttributes<HTMLAppMonacoEditorElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
         }
     }

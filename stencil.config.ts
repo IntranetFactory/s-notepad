@@ -16,6 +16,10 @@ export const config: Config = {
       {
         src: '../node_modules/@vanillawc/wc-monaco-editor/monaco/workers',
         dest: 'build/wc-monaco-editor/monaco/workers'
+      },
+      {
+        src: '../node_modules/monaco-editor/min/vs/',
+        dest: 'build/monaco-editor/vs/'
       }
     ]
   }],

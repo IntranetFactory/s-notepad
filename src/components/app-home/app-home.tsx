@@ -1,5 +1,5 @@
 import { alertController, popoverController } from '@ionic/core';
-import { Component, ComponentInterface, h, Host, Prop } from '@stencil/core';
+import { Component, ComponentInterface, h, Host, Prop, State } from '@stencil/core';
 import mousetrap from 'mousetrap';
 import pako from 'pako';
 
@@ -36,20 +36,16 @@ export class AppHome implements ComponentInterface {
     this.updateAppTitle();
   }
 
-  private get editorContent() {
-    return (this.monacoEditorElement as any).value;
-  }
-  private set editorContent(value: string) {
-    (this.monacoEditorElement as any).value = value;
-  }
-
   private get baseUrl() {
     return window.location.origin.replace(window.location.hash, '');
   }
 
+  @State() editorLanguage: string;
+  @State() editorValue: string;
+
   @Prop() sharedContentBase64: string;
 
-  componentDidLoad() {
+  async componentDidLoad() {
     window.addEventListener('beforeunload', event => {
       if (this.isAnyChangePending) {
         const message = 'You have unsaved changes, are you really sure to close the document?';
@@ -57,25 +53,20 @@ export class AppHome implements ComponentInterface {
       }
     });
 
-    // TODO find out a way that do not need to use setTimeout
-    setTimeout(() => {
-      if (this.sharedContentBase64) {
-        debugger
-        const encodedBuffer = this.base64ToBuffer(this.sharedContentBase64.replace(/-/g, '/'));
-        const inflatedBuffer = pako.inflate(encodedBuffer);
-        this.editorContent = new TextDecoder('utf8').decode(inflatedBuffer);
-      }
-      if ('launchQueue' in window) {
-        window['launchQueue'].setConsumer((launchParams) => {
-          if (launchParams.files?.length > 0) {
-            for (const fileHandle of launchParams.files) {
-              this.openFile(fileHandle);
-            }
+    if (this.sharedContentBase64) {
+      const encodedBuffer = this.base64ToBuffer(this.sharedContentBase64.replace(/-/g, '/'));
+      const inflatedBuffer = pako.inflate(encodedBuffer);
+      this.editorValue = new TextDecoder('utf8').decode(inflatedBuffer);
+    }
+    if ('launchQueue' in window) {
+      window['launchQueue'].setConsumer((launchParams) => {
+        if (launchParams.files?.length > 0) {
+          for (const fileHandle of launchParams.files) {
+            this.openFile(fileHandle);
           }
-        });
-      }
-      (this.monacoEditorElement as any).editor.onDidChangeModelContent(() => this.isAnyChangePending = true);
-    }, 1000);
+        }
+      });
+    }
 
     this.addKeyboardShortcuts();
   }
@@ -103,12 +94,18 @@ export class AppHome implements ComponentInterface {
         </ion-header>
 
         <ion-content scrollY={false}>
-          <wc-monaco-editor
+          <app-monaco-editor
             ref={el => this.monacoEditorElement = el}
-            onDragover={event => event.preventDefault()}
+            value={this.editorValue}
+            language={this.editorLanguage}
+            onDidChangeModelContent={event => {
+              this.isAnyChangePending = true;
+              this.editorValue = (event.target as HTMLAppMonacoEditorElement).value;
+            }}
+            onDragOver={event => event.preventDefault()}
             onDrop={async event => {
               event.preventDefault();
-              for (const item of event.dataTransfer.items) {
+              for (const item of (event.dataTransfer.items as any)) {
                 if (item.kind === 'file') {
                   const fileHandle = await item.getAsFileSystemHandle();
                   if (fileHandle.kind === 'file') {
@@ -124,14 +121,14 @@ export class AppHome implements ComponentInterface {
                 }
               }
             }}
-          ></wc-monaco-editor>
+          ></app-monaco-editor>
         </ion-content>
       </Host >
     );
   }
 
   private async shareSnapshot() {
-    const deflatedText = pako.deflate(new TextEncoder().encode(this.editorContent));
+    const deflatedText = pako.deflate(new TextEncoder().encode(this.editorValue));
     const base64String = this.bufferToBase64(deflatedText).replace(/\//g, '-');
     if (navigator.share) {
       navigator.share({
@@ -180,7 +177,7 @@ export class AppHome implements ComponentInterface {
   private async createNew() {
     await this.alertIfAnyPendingChange(() => {
       this.fileHandle = undefined;
-      this.editorContent = '';
+      this.editorValue = '';
       this.isAnyChangePending = false;
     });
   }
@@ -199,7 +196,7 @@ export class AppHome implements ComponentInterface {
       });
     }
     const writableStream = await this.fileHandle.createWritable();
-    await writableStream.write(this.editorContent);
+    await writableStream.write(this.editorValue);
     await writableStream.close();
     this.isAnyChangePending = false;
   }
@@ -219,7 +216,7 @@ export class AppHome implements ComponentInterface {
   }
 
   private loadContentToEditor(content: string) {
-    this.editorContent = content;
+    this.editorValue = content;
   }
 
   private async alertIfAnyPendingChange(continueHandler: () => void, cancelHandler?: () => void) {
