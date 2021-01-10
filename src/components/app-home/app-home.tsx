@@ -41,7 +41,7 @@ export class AppHome implements ComponentInterface {
   @Prop({ mutable: true }) editorLanguage: string = 'plaintext';
   @Prop() sharedContentBase64: string;
 
-  async componentDidLoad() {
+  componentDidLoad() {
     window.addEventListener('beforeunload', event => {
       if (this.isAnyChangePending) {
         const message = 'You have unsaved changes, are you really sure to close the document?';
@@ -64,7 +64,10 @@ export class AppHome implements ComponentInterface {
       });
     }
 
-    this.editorLanguages = await this.monacoEditorElement.getEditorLanguages();
+    // TODO find a way to not use setTimeout
+    setTimeout(async () => {
+      this.editorLanguages = await this.monacoEditorElement.getEditorLanguages();
+    }, 1000);
 
     this.addKeyboardShortcuts();
   }
