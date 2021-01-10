@@ -10,14 +10,6 @@ export const config: Config = {
     type: 'www',
     copy: [
       {
-        src: '../node_modules/@vanillawc/wc-monaco-editor/index.min.js',
-        dest: 'build/wc-monaco-editor/index.min.js'
-      },
-      {
-        src: '../node_modules/@vanillawc/wc-monaco-editor/monaco/workers',
-        dest: 'build/wc-monaco-editor/monaco/workers'
-      },
-      {
         src: '../node_modules/monaco-editor/min/vs/',
         dest: 'build/monaco-editor/vs/'
       }
