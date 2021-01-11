@@ -1,4 +1,5 @@
 import { Component, ComponentInterface, h } from '@stencil/core';
+import { applyTheme, getActualTheme } from '../../global/theme';
 
 @Component({
   tag: 'app-root',
@@ -7,8 +8,7 @@ import { Component, ComponentInterface, h } from '@stencil/core';
 export class AppRoot implements ComponentInterface {
 
   connectedCallback() {
-    document.body.classList.toggle('dark', true);
-    document.body.style['colorScheme'] = 'dark';
+    applyTheme(getActualTheme());
   }
 
   render() {

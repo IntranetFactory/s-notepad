@@ -3,6 +3,7 @@ import { Component, ComponentInterface, h, Host, Prop, State } from '@stencil/co
 import { languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
 import pako from 'pako';
+import { getActualTheme } from '../../global/theme';
 
 @Component({
   tag: 'app-home',
@@ -35,6 +36,7 @@ export class AppHome implements ComponentInterface {
 
   @State() editorValue: string;
   @State() editorLanguages: languages.ILanguageExtensionPoint[];
+  @State() editorTheme: string = getActualTheme() === 'light' ? 'vs-light' : 'vs-dark';
 
   @Prop({ mutable: true }) editorLanguage: string = 'plaintext';
   @Prop() sharedContentBase64: string;
@@ -76,6 +78,10 @@ export class AppHome implements ComponentInterface {
                 <ion-icon name="document" slot="start"></ion-icon>
                 <ion-label>File</ion-label>
               </ion-button>
+              <ion-button onClick={event => this.showSettingMenu(event)}>
+                <ion-icon name="settings" slot="start"></ion-icon>
+                <ion-label>Settings</ion-label>
+              </ion-button>
             </ion-buttons>
             {
               this.editorLanguages &&
@@ -108,6 +114,7 @@ export class AppHome implements ComponentInterface {
           <app-monaco-editor
             value={this.editorValue}
             language={this.editorLanguage}
+            theme={this.editorTheme}
             onComponentLoad={({ detail }) => this.editorLanguages = detail.languages.getLanguages()}
             onDidChangeModelContent={event => {
               this.isAnyChangePending = true;
@@ -175,6 +182,19 @@ export class AppHome implements ComponentInterface {
         saveFileHandler: () => this.saveFile(),
         saveFileAsHandler: () => this.saveFile(true),
         exitHandler: () => this.exit()
+      }
+    });
+    await popover.present();
+  }
+
+  private async showSettingMenu(event: MouseEvent) {
+    const popover = await popoverController.create({
+      id: 'setting-menu',
+      component: 'app-setting-menu',
+      event: event,
+      translucent: true,
+      componentProps: {
+        updateEditorThemeHandler: theme => this.editorTheme = theme === 'light' ? 'vs-light' : 'vs-dark'
       }
     });
     await popover.present();

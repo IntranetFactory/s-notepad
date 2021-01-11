@@ -27,6 +27,9 @@ export namespace Components {
     }
     interface AppRoot {
     }
+    interface AppSettingMenu {
+        "updateEditorThemeHandler": (theme: 'light' | 'dark') => void;
+    }
 }
 declare global {
     interface HTMLAppFileMenuElement extends Components.AppFileMenu, HTMLStencilElement {
@@ -53,11 +56,18 @@ declare global {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
     };
+    interface HTMLAppSettingMenuElement extends Components.AppSettingMenu, HTMLStencilElement {
+    }
+    var HTMLAppSettingMenuElement: {
+        prototype: HTMLAppSettingMenuElement;
+        new (): HTMLAppSettingMenuElement;
+    };
     interface HTMLElementTagNameMap {
         "app-file-menu": HTMLAppFileMenuElement;
         "app-home": HTMLAppHomeElement;
         "app-monaco-editor": HTMLAppMonacoEditorElement;
         "app-root": HTMLAppRootElement;
+        "app-setting-menu": HTMLAppSettingMenuElement;
     }
 }
 declare namespace LocalJSX {
@@ -82,11 +92,15 @@ declare namespace LocalJSX {
     }
     interface AppRoot {
     }
+    interface AppSettingMenu {
+        "updateEditorThemeHandler"?: (theme: 'light' | 'dark') => void;
+    }
     interface IntrinsicElements {
         "app-file-menu": AppFileMenu;
         "app-home": AppHome;
         "app-monaco-editor": AppMonacoEditor;
         "app-root": AppRoot;
+        "app-setting-menu": AppSettingMenu;
     }
 }
 export { LocalJSX as JSX };
@@ -97,6 +111,7 @@ declare module "@stencil/core" {
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-monaco-editor": LocalJSX.AppMonacoEditor & JSXBase.HTMLAttributes<HTMLAppMonacoEditorElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+            "app-setting-menu": LocalJSX.AppSettingMenu & JSXBase.HTMLAttributes<HTMLAppSettingMenuElement>;
         }
     }
 }
