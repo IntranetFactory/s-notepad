@@ -1,6 +1,6 @@
-import { Component, Host, h, ComponentInterface, Prop, Event, EventEmitter, Method } from '@stencil/core';
+import { Component, Host, h, ComponentInterface, Prop, Event, EventEmitter } from '@stencil/core';
 import monacoLoader, { Monaco } from '@monaco-editor/loader';
-import { editor, languages } from 'monaco-editor';
+import { editor } from 'monaco-editor';
 
 @Component({
   tag: 'app-monaco-editor',
@@ -17,6 +17,7 @@ export class AppMonacoEditor implements ComponentInterface {
   @Prop() language: string;
   @Prop() theme: string = 'vs-dark';
 
+  @Event() componentLoad: EventEmitter<Monaco>
   @Event() didChangeModelContent: EventEmitter<editor.IModelContentChangedEvent>;
 
   async componentDidLoad() {
@@ -36,6 +37,8 @@ export class AppMonacoEditor implements ComponentInterface {
       this.value = this.editor.getValue();
       this.didChangeModelContent.emit(event);
     });
+
+    this.componentLoad.emit(this.monaco);
   }
 
   componentShouldUpdate(newValue: any, _oldValue: any, propName: string) {
@@ -53,11 +56,6 @@ export class AppMonacoEditor implements ComponentInterface {
         break;
     }
     return false;
-  }
-
-  @Method()
-  async getEditorLanguages() {
-    return this.monaco.languages.getLanguages() as languages.ILanguageExtensionPoint[];
   }
 
   render() {

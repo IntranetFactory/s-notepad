@@ -20,8 +20,6 @@ export class AppHome implements ComponentInterface {
     this.updateAppTitle();
   }
 
-  private monacoEditorElement: HTMLAppMonacoEditorElement;
-
   private _fileHandle: any;
   private get fileHandle() {
     return this._fileHandle;
@@ -64,10 +62,6 @@ export class AppHome implements ComponentInterface {
       });
     }
 
-    // TODO find a way to not use setTimeout
-    setTimeout(async () => {
-      this.editorLanguages = await this.monacoEditorElement.getEditorLanguages();
-    }, 1000);
 
     this.addKeyboardShortcuts();
   }
@@ -83,19 +77,22 @@ export class AppHome implements ComponentInterface {
                 <ion-label>File</ion-label>
               </ion-button>
             </ion-buttons>
-            <ion-select
-              slot="end"
-              interface="popover"
-              value={this.editorLanguage}
-              placeholder="Content Format"
-              onIonChange={({ detail }) => this.editorLanguage = detail.value}
-            >
-              {
-                this.editorLanguages?.map(language =>
-                  <ion-select-option value={language.id}>{language.aliases[0]}</ion-select-option>
-                )
-              }
-            </ion-select>
+            {
+              this.editorLanguages &&
+              <ion-select
+                slot="end"
+                interface="popover"
+                value={this.editorLanguage}
+                placeholder="Content Format"
+                onIonChange={({ detail }) => this.editorLanguage = detail.value}
+              >
+                {
+                  this.editorLanguages?.map(language =>
+                    <ion-select-option value={language.id}>{language.aliases[0]}</ion-select-option>
+                  )
+                }
+              </ion-select>
+            }
             <ion-buttons slot="end">
               <ion-button
                 title="Share a snapshot"
@@ -109,9 +106,9 @@ export class AppHome implements ComponentInterface {
 
         <ion-content scrollY={false}>
           <app-monaco-editor
-            ref={el => this.monacoEditorElement = el}
             value={this.editorValue}
             language={this.editorLanguage}
+            onComponentLoad={({ detail }) => this.editorLanguages = detail.languages.getLanguages()}
             onDidChangeModelContent={event => {
               this.isAnyChangePending = true;
               this.editorValue = (event.target as HTMLAppMonacoEditorElement).value;

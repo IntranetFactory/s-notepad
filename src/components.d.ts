@@ -5,7 +5,8 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { editor, languages } from "monaco-editor";
+import { Monaco } from "@monaco-editor/loader";
+import { editor } from "monaco-editor";
 export namespace Components {
     interface AppFileMenu {
         "exitHandler": () => void;
@@ -20,7 +21,6 @@ export namespace Components {
         "sharedContentBase64": string;
     }
     interface AppMonacoEditor {
-        "getEditorLanguages": () => Promise<languages.ILanguageExtensionPoint[]>;
         "language": string;
         "theme": string;
         "value": string;
@@ -75,6 +75,7 @@ declare namespace LocalJSX {
     }
     interface AppMonacoEditor {
         "language"?: string;
+        "onComponentLoad"?: (event: CustomEvent<Monaco>) => void;
         "onDidChangeModelContent"?: (event: CustomEvent<editor.IModelContentChangedEvent>) => void;
         "theme"?: string;
         "value"?: string;
