@@ -101,6 +101,12 @@ export class AppHome implements ComponentInterface {
             }
             <ion-buttons slot="end">
               <ion-button
+                title="Embed a snapshot"
+                onClick={() => this.embed()}
+              >
+                <ion-icon slot="icon-only" name="code-working"></ion-icon>
+              </ion-button>
+              <ion-button
                 title="Share a snapshot"
                 onClick={() => this.shareSnapshot()}
               >
@@ -143,6 +149,59 @@ export class AppHome implements ComponentInterface {
         </ion-content>
       </Host >
     );
+  }
+
+  private async embed() {
+    const alert = await alertController.create({
+      header: 'Embed A Snapshot ',
+      inputs: [
+        {
+          type: 'checkbox',
+          label: 'Read Only',
+          name: 'checkbox',
+          value: 'readOnly'
+        },
+        {
+          type: 'checkbox',
+          label: 'Dark Theme',
+          name: 'checkbox',
+          value: 'darkTheme'
+        }
+      ],
+      buttons: [
+        'Cancel',
+        {
+          text: 'OK',
+          handler: async value => {
+            const checkboxCheckedItems = value as string[];
+
+            const deflatedText = pako.deflate(new TextEncoder().encode(this.editorValue));
+            const base64String = this.bufferToBase64(deflatedText).replace(/\//g, '-');
+            let url = `${this.baseUrl}#/embed?`;
+            if (checkboxCheckedItems.indexOf('readOnly') >= 0) {
+              url += `readOnly=true&`;
+            }
+            if (checkboxCheckedItems.indexOf('darkTheme') >= 0) {
+              url += `theme=vs-dark&`;
+            }
+            url += `language=${this.editorLanguage}&` +
+              `value=${base64String}`;
+            const resultAlert = await alertController.create({
+              header: 'You can copy the code snippet and use it in your website.',
+              inputs: [
+                {
+                  type: 'textarea',
+                  value: `<iframe width="500px" height="500px" src="${url}"></iframe>`
+                }
+              ],
+              buttons: ['OK']
+            });
+            await resultAlert.present();
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   private async shareSnapshot() {

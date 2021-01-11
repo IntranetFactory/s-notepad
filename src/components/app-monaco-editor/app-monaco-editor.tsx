@@ -15,7 +15,8 @@ export class AppMonacoEditor implements ComponentInterface {
 
   @Prop() value: string;
   @Prop() language: string;
-  @Prop() theme: string = 'vs-dark';
+  @Prop() theme: string = 'vs-light';
+  @Prop() readOnly: boolean = false;
 
   @Event() componentLoad: EventEmitter<Monaco>
   @Event() didChangeModelContent: EventEmitter<editor.IModelContentChangedEvent>;
@@ -31,6 +32,7 @@ export class AppMonacoEditor implements ComponentInterface {
       value: this.value,
       language: this.language,
       theme: this.theme,
+      readOnly: this.readOnly,
       automaticLayout: true
     });
     this.editor.onDidChangeModelContent(event => {
@@ -51,8 +53,10 @@ export class AppMonacoEditor implements ComponentInterface {
       case 'language':
         this.monaco.editor.setModelLanguage(this.editor.getModel(), newValue);
         break;
-      case 'theme':
-        this.editor.updateOptions({ theme: newValue });
+      default:
+        const updatedOption = {};
+        updatedOption[propName] = newValue;
+        this.editor.updateOptions(updatedOption);
         break;
     }
     return false;
