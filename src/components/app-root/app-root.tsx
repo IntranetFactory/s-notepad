@@ -8,6 +8,7 @@ export class AppRoot implements ComponentInterface {
 
   connectedCallback() {
     document.body.classList.toggle('dark', true);
+    document.body.style['colorScheme'] = 'dark';
   }
 
   render() {
