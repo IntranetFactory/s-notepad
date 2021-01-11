@@ -7,7 +7,7 @@ export function getTheme() {
 export function getActualTheme() {
     const theme = getTheme();
     if (theme === 'system') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (prefersDark) {
             return 'dark';
         } else {
