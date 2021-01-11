@@ -1,12 +1,12 @@
 import { popoverController } from '@ionic/core';
-import { Component, Host, h, Prop } from '@stencil/core';
+import { Component, Host, h, Prop, ComponentInterface } from '@stencil/core';
 
 @Component({
   tag: 'app-file-menu',
   styleUrl: 'app-file-menu.css',
   scoped: true,
 })
-export class AppFileMenu {
+export class AppFileMenu implements ComponentInterface {
 
   private get isStandaloneDisplayMode() {
     let isStandalone = false;
