@@ -3,7 +3,7 @@ import { Component, ComponentInterface, h, Host, Prop, State } from '@stencil/co
 import { languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
 import pako from 'pako';
-import { getActualTheme } from '../../global/theme';
+import { applyTheme, getActualTheme } from '../../global/theme';
 
 @Component({
   tag: 'app-home',
@@ -40,6 +40,11 @@ export class AppHome implements ComponentInterface {
 
   @Prop({ mutable: true }) editorLanguage: string = 'plaintext';
   @Prop() sharedContentBase64: string;
+
+
+  connectedCallback() {
+    applyTheme(getActualTheme());
+  }
 
   componentDidLoad() {
     window.addEventListener('beforeunload', event => {
