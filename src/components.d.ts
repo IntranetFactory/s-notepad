@@ -5,8 +5,6 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Monaco } from "@monaco-editor/loader";
-import { editor } from "monaco-editor";
 export namespace Components {
     interface AppEmbed {
     }
@@ -21,12 +19,6 @@ export namespace Components {
     interface AppHome {
         "editorLanguage": string;
         "sharedContentBase64": string;
-    }
-    interface AppMonacoEditor {
-        "language": string;
-        "readOnly": boolean;
-        "theme": string;
-        "value": string;
     }
     interface AppRoot {
     }
@@ -53,12 +45,6 @@ declare global {
         prototype: HTMLAppHomeElement;
         new (): HTMLAppHomeElement;
     };
-    interface HTMLAppMonacoEditorElement extends Components.AppMonacoEditor, HTMLStencilElement {
-    }
-    var HTMLAppMonacoEditorElement: {
-        prototype: HTMLAppMonacoEditorElement;
-        new (): HTMLAppMonacoEditorElement;
-    };
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
     var HTMLAppRootElement: {
@@ -75,7 +61,6 @@ declare global {
         "app-embed": HTMLAppEmbedElement;
         "app-file-menu": HTMLAppFileMenuElement;
         "app-home": HTMLAppHomeElement;
-        "app-monaco-editor": HTMLAppMonacoEditorElement;
         "app-root": HTMLAppRootElement;
         "app-setting-menu": HTMLAppSettingMenuElement;
     }
@@ -95,14 +80,6 @@ declare namespace LocalJSX {
         "editorLanguage"?: string;
         "sharedContentBase64"?: string;
     }
-    interface AppMonacoEditor {
-        "language"?: string;
-        "onComponentLoad"?: (event: CustomEvent<Monaco>) => void;
-        "onDidChangeModelContent"?: (event: CustomEvent<editor.IModelContentChangedEvent>) => void;
-        "readOnly"?: boolean;
-        "theme"?: string;
-        "value"?: string;
-    }
     interface AppRoot {
     }
     interface AppSettingMenu {
@@ -112,7 +89,6 @@ declare namespace LocalJSX {
         "app-embed": AppEmbed;
         "app-file-menu": AppFileMenu;
         "app-home": AppHome;
-        "app-monaco-editor": AppMonacoEditor;
         "app-root": AppRoot;
         "app-setting-menu": AppSettingMenu;
     }
@@ -124,7 +100,6 @@ declare module "@stencil/core" {
             "app-embed": LocalJSX.AppEmbed & JSXBase.HTMLAttributes<HTMLAppEmbedElement>;
             "app-file-menu": LocalJSX.AppFileMenu & JSXBase.HTMLAttributes<HTMLAppFileMenuElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
-            "app-monaco-editor": LocalJSX.AppMonacoEditor & JSXBase.HTMLAttributes<HTMLAppMonacoEditorElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-setting-menu": LocalJSX.AppSettingMenu & JSXBase.HTMLAttributes<HTMLAppSettingMenuElement>;
         }

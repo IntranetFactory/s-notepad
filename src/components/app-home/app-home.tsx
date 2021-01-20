@@ -4,6 +4,7 @@ import { languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
 import pako from 'pako';
 import { applyTheme, getActualTheme } from '../../global/theme';
+import '@seanwong24/s-monaco-editor';
 
 @Component({
   tag: 'app-home',
@@ -122,14 +123,15 @@ export class AppHome implements ComponentInterface {
         </ion-header>
 
         <ion-content scrollY={false}>
-          <app-monaco-editor
+          <s-monaco-editor
+            monaco-vs-path="./build/monaco-editor/vs"
             value={this.editorValue}
             language={this.editorLanguage}
             theme={this.editorTheme}
-            onComponentLoad={({ detail }) => this.editorLanguages = detail.languages.getLanguages()}
+            onComponentLoad={({ detail }) => this.editorLanguages = detail.monaco.languages.getLanguages()}
             onDidChangeModelContent={event => {
               this.isAnyChangePending = true;
-              this.editorValue = (event.target as HTMLAppMonacoEditorElement).value;
+              this.editorValue = (event.target as HTMLSMonacoEditorElement).value;
             }}
             onDragOver={event => event.preventDefault()}
             onDrop={async event => {
@@ -150,7 +152,7 @@ export class AppHome implements ComponentInterface {
                 }
               }
             }}
-          ></app-monaco-editor>
+          ></s-monaco-editor>
         </ion-content>
       </Host >
     );

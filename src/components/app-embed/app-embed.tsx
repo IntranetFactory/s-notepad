@@ -1,5 +1,6 @@
 import { Component, Host, h, ComponentInterface } from '@stencil/core';
 import pako from 'pako';
+import '@seanwong24/s-monaco-editor';
 
 @Component({
   tag: 'app-embed',
@@ -25,12 +26,13 @@ export class AppEmbed implements ComponentInterface {
   render() {
     return (
       <Host>
-        <app-monaco-editor
+        <s-monaco-editor
+          monaco-vs-path="./build/monaco-editor/vs"
           value={this.editorValue}
           language={this.searchParams.get('language')}
           theme={this.searchParams.get('theme')}
           readOnly={JSON.parse(this.searchParams.get('readOnly'))}
-        ></app-monaco-editor>
+        ></s-monaco-editor>
       </Host>
     );
   }
