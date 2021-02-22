@@ -14,6 +14,7 @@ import '@seanwong24/s-monaco-editor';
 export class AppHome implements ComponentInterface {
 
   private editorInstance: editor.IStandaloneCodeEditor;
+  private isFileJustOpened: boolean = false;
 
   private _isAnyChangePending: boolean = false;
   private get isAnyChangePending() {
@@ -137,7 +138,11 @@ export class AppHome implements ComponentInterface {
               this.editorLanguages = detail.monaco.languages.getLanguages();
             }}
             onDidChangeModelContent={event => {
-              this.isAnyChangePending = true;
+              if (this.isFileJustOpened) {
+                this.isFileJustOpened = false;
+              } else {
+                this.isAnyChangePending = true;
+              }
               this.editorValue = (event.target as HTMLSMonacoEditorElement).value;
               const lineCountDigits = this.editorInstance.getModel().getLineCount().toString().length;
               this.lineNumbersMinChars = lineCountDigits >= 5 ? lineCountDigits + 1 : 5;
@@ -314,6 +319,7 @@ export class AppHome implements ComponentInterface {
       const content = await this.readFile();
       this.loadContentToEditor(content);
       this.isAnyChangePending = false;
+      this.isFileJustOpened = true;
     });
   }
 
