@@ -1,6 +1,6 @@
 import { alertController, popoverController } from '@ionic/core';
 import { Component, ComponentInterface, h, Host, Prop, State } from '@stencil/core';
-import { languages } from 'monaco-editor';
+import { editor, languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
 import pako from 'pako';
 import { applyTheme, getActualTheme } from '../../global/theme';
@@ -12,6 +12,8 @@ import '@seanwong24/s-monaco-editor';
   scoped: true,
 })
 export class AppHome implements ComponentInterface {
+
+  private editorInstance: editor.IStandaloneCodeEditor;
 
   private _isAnyChangePending: boolean = false;
   private get isAnyChangePending() {
@@ -38,6 +40,7 @@ export class AppHome implements ComponentInterface {
   @State() editorValue: string;
   @State() editorLanguages: languages.ILanguageExtensionPoint[];
   @State() editorTheme: string = getActualTheme() === 'light' ? 'vs-light' : 'vs-dark';
+  @State() lineNumbersMinChars: number = 5;
 
   @Prop({ mutable: true }) editorLanguage: string = 'plaintext';
   @Prop() sharedContentBase64: string;
@@ -128,10 +131,16 @@ export class AppHome implements ComponentInterface {
             value={this.editorValue}
             language={this.editorLanguage}
             theme={this.editorTheme}
-            onComponentLoad={({ detail }) => this.editorLanguages = detail.monaco.languages.getLanguages()}
+            lineNumbersMinChars={this.lineNumbersMinChars}
+            onComponentLoad={({ detail }) => {
+              this.editorInstance = detail.editor;
+              this.editorLanguages = detail.monaco.languages.getLanguages();
+            }}
             onDidChangeModelContent={event => {
               this.isAnyChangePending = true;
               this.editorValue = (event.target as HTMLSMonacoEditorElement).value;
+              const lineCountDigits = this.editorInstance.getModel().getLineCount().toString().length;
+              this.lineNumbersMinChars = lineCountDigits >= 5 ? lineCountDigits + 1 : 5;
             }}
             onDragOver={event => event.preventDefault()}
             onDrop={async event => {

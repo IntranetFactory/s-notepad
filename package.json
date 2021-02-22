@@ -22,7 +22,7 @@
     "workbox-build": "^4.3.1"
   },
   "dependencies": {
-    "@seanwong24/s-monaco-editor": "^0.1.1",
+    "@seanwong24/s-monaco-editor": "^0.2.0",
     "mousetrap": "^1.6.5",
     "pako": "^2.0.2"
   }
