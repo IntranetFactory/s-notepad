@@ -1,0 +1,12 @@
+#main-container {
+    height: 100%;
+    overflow: hidden;
+}
+
+#command-bar {
+    flex: 0 1 auto;
+}
+
+#editor {
+    flex: 1 1 auto;
+}
