@@ -1,4 +1,4 @@
-import { CommandBar, ICommandBarItemProps, ThemeProvider } from '@fluentui/react';
+import { BaseButton, Button, CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, ICommandBarItemProps, IDialogContentProps, IModalProps, PrimaryButton, ThemeProvider } from '@fluentui/react';
 import { languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
 import React from 'react';
@@ -17,6 +17,11 @@ export const Home: React.FunctionComponent = () => {
   const [editorLanguage, setEditorLanguage] = useState<string>('plaintext');
   const [editorLanguages, setEditorLanguages] = useState<languages.ILanguageExtensionPoint[]>();
   const [editorTheme] = useState<string>(getActualTheme() === 'light' ? 'vs-light' : 'vs-dark');
+  const [dialogConfig, setDialogConfig] = useState<{
+    dialogProps?: IDialogContentProps,
+    modalProps?: IModalProps,
+    buttons?: { text: string, handler?: React.MouseEventHandler<HTMLDivElement | HTMLAnchorElement | HTMLButtonElement | BaseButton | Button | HTMLSpanElement>, type: any }[]
+  }>();
 
   useEffect(() => {
     applyTheme(getActualTheme());
@@ -186,22 +191,32 @@ export const Home: React.FunctionComponent = () => {
 
   async function alertIfAnyPendingChange(continueHandler: () => void, cancelHandler?: () => void) {
     if (isAnyChangePending) {
-      // const alert = await alertController.create({
-      //   header: 'You have unsaved changes',
-      //   message: 'Do you really want to close current document without saving the changes?',
-      //   buttons: [
-      //     {
-      //       text: 'No',
-      //       handler: cancelHandler
-      //     },
-      //     {
-      //       text: 'Yes',
-      //       handler: continueHandler
-      //     }
-      //   ]
-      // });
-      // await alert.present();
-      continueHandler();
+      setDialogConfig({
+        dialogProps: {
+          type: DialogType.normal,
+          title: 'You have unsaved changes',
+          subText: 'Do you really want to close current document without saving the changes?',
+        },
+        modalProps: { isBlocking: true },
+        buttons: [
+          {
+            type: PrimaryButton,
+            text: 'Yes',
+            handler: () => {
+              continueHandler();
+              setDialogConfig(undefined);
+            },
+          },
+          {
+            type: DefaultButton,
+            text: 'No',
+            handler: () => {
+              cancelHandler?.();
+              setDialogConfig(undefined);
+            },
+          },
+        ]
+      });
     } else {
       continueHandler();
     }
@@ -225,6 +240,23 @@ export const Home: React.FunctionComponent = () => {
   return (
     <div id="main-container">
       <ThemeProvider id="theme-provider" theme={getActualFluentTheme()}>
+        {
+          dialogConfig &&
+          <Dialog
+            hidden={false}
+            onDismiss={() => setDialogConfig(undefined)}
+            dialogContentProps={dialogConfig?.dialogProps}
+            modalProps={dialogConfig?.modalProps}
+          >
+            <DialogFooter>
+              {
+                dialogConfig.buttons?.map(button => (
+                  <button.type key={button.text} text={button.text} onClick={button.handler}></button.type>
+                ))
+              }
+            </DialogFooter>
+          </Dialog>
+        }
         <CommandBar
           id="command-bar"
           items={getCommandBarItems()}
