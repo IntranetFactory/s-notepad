@@ -91,24 +91,28 @@ export const Home: React.FunctionComponent = () => {
             {
               key: 'new',
               text: 'New',
+              secondaryText: 'Ctrl + N',
               iconProps: { iconName: 'Document' },
               onClick: () => createNew(),
             },
             {
               key: 'open',
               text: 'Open',
+              secondaryText: 'Ctrl + O',
               iconProps: { iconName: 'OpenFile' },
               onClick: () => openFile(),
             },
             {
               key: 'save',
               text: 'Save',
+              secondaryText: 'Ctrl + S',
               iconProps: { iconName: 'Save' },
               onClick: () => saveFile(),
             },
             {
               key: 'saveAs',
               text: 'Save As',
+              secondaryText: 'Ctrl + Shift + S',
               iconProps: { iconName: 'SaveAs' },
               onClick: () => saveFile(),
             },
