@@ -1,9 +1,11 @@
 import { BaseButton, Button, CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, ICommandBarItemProps, IDialogContentProps, IModalProps, PrimaryButton, ThemeProvider } from '@fluentui/react';
 import { languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
+import pako from 'pako';
 import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { getActualFluentTheme, getActualTheme, setTheme } from '../utils/theme';
 
 import './Home.css';
@@ -11,6 +13,8 @@ import './Home.css';
 let fileHandle: any;
 let isAnyChangePending = false;
 let isFileJustOpened = false;
+
+const baseUrl = window.location.origin;
 
 export const Home: React.FunctionComponent = () => {
   const [editorValue, setEditorValue] = useState<string>('');
@@ -23,6 +27,8 @@ export const Home: React.FunctionComponent = () => {
     buttons?: { text: string, handler?: React.MouseEventHandler<HTMLDivElement | HTMLAnchorElement | HTMLButtonElement | BaseButton | Button | HTMLSpanElement>, type: any }[]
   }>();
 
+  const { editorLanguage: _editorLanguage, sharedContentBase64 } = useParams<any>();
+  
   useEffect(() => {
     window.addEventListener('beforeunload', (event: any) => {
       if (isAnyChangePending) {
@@ -30,6 +36,13 @@ export const Home: React.FunctionComponent = () => {
         event.returnValue = message;
       }
     });
+    
+    if (sharedContentBase64) {
+      const encodedBuffer = base64ToBuffer(sharedContentBase64.replace(/-/g, '/'));
+      const inflatedBuffer = pako.inflate(encodedBuffer);
+      setEditorLanguage(_editorLanguage);
+      setEditorValue(new TextDecoder('utf8').decode(inflatedBuffer));
+    }
 
     if ('launchQueue' in window) {
       (window as any)['launchQueue'].setConsumer((launchParams: any) => {
@@ -177,6 +190,7 @@ export const Home: React.FunctionComponent = () => {
               key: 'snapshot',
               text: 'Snapshot',
               iconProps: { iconName: 'Camera' },
+              onClick: () => shareSnapshot(),
             },
             {
               key: 'embed',
@@ -230,6 +244,21 @@ export const Home: React.FunctionComponent = () => {
     await alertIfAnyPendingChange(() => {
       window.close();
     });
+  }
+
+  async function shareSnapshot() {
+    const deflatedText = pako.deflate(new TextEncoder().encode(editorValue));
+    const base64String = bufferToBase64(deflatedText).replace(/\//g, '-');
+    const url = `${baseUrl}/snapshot/${editorLanguage || 'plaintext'}/${base64String}`;
+    if (navigator.share) {
+      navigator.share({
+        title: document.title,
+        text: document.title,
+        url
+      });
+    } else {
+      prompt('You can copy the link and share it.', url);
+    }
   }
 
   async function readFile() {
@@ -377,3 +406,19 @@ export const Home: React.FunctionComponent = () => {
     </div>
   );
 };
+
+function bufferToBase64(buffer: Uint8Array) {
+  var binstr = Array.prototype.map.call(buffer, function (character) {
+    return String.fromCharCode(character);
+  }).join('');
+  return btoa(binstr);
+}
+
+function base64ToBuffer(base64: string) {
+  var binstr = atob(base64);
+  var buffer = new Uint8Array(binstr.length);
+  Array.prototype.forEach.call(binstr, function (character, i) {
+    buffer[i] = character.charCodeAt(0);
+  });
+  return buffer;
+}

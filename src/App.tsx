@@ -10,6 +10,9 @@ export const App: React.FunctionComponent = () => {
       <Route exact path="/">
         <Home />
       </Route>
+      <Route exact path="/snapshot/:editorLanguage/:sharedContentBase64">
+        <Home />
+      </Route>
     </Router>
   );
 };
