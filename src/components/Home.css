@@ -3,6 +3,10 @@
     overflow: hidden;
 }
 
+#theme-provider {
+    height: 100%;
+}
+
 #command-bar {
     flex: 0 1 auto;
 }

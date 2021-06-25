@@ -1,7 +1,9 @@
-import { CommandBar, ICommandBarItemProps, setLanguage } from '@fluentui/react';
-import { editor, languages } from 'monaco-editor';
+import { CommandBar, ICommandBarItemProps, ThemeProvider } from '@fluentui/react';
+import { languages } from 'monaco-editor';
 import React from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
+import { applyTheme, getActualFluentTheme, getActualTheme } from '../utils/theme';
 
 import './Home.css';
 
@@ -9,8 +11,62 @@ export const Home: React.FunctionComponent = () => {
   const [editorValue] = useState<string>();
   const [editorLanguage, setEditorLanguage] = useState<string>('plaintext');
   const [editorLanguages, setEditorLanguages] = useState<languages.ILanguageExtensionPoint[]>();
+  const [editorTheme] = useState<string>(getActualTheme() === 'light' ? 'vs-light' : 'vs-dark');
 
-  const items: ICommandBarItemProps[] = [
+  useEffect(() => {
+    applyTheme(getActualTheme());
+  }, []);
+
+  return (
+    <div id="main-container">
+      <ThemeProvider id="theme-provider" theme={getActualFluentTheme()}>
+        <CommandBar
+          id="command-bar"
+          items={getCommandBarItems()}
+          farItems={getCommandBarFarItems({ editorLanguage, editorLanguages, setEditorLanguage })}
+          ariaLabel="Use left and right arrow keys to navigate between commands"
+        />
+        <s-monaco-editor
+          id="editor"
+          value={editorValue}
+          language={editorLanguage}
+          theme={editorTheme}
+          ref={el => {
+            el?.addEventListener('componentLoad', event => {
+              const detail = (event as CustomEvent).detail;
+              setEditorLanguages(detail.monaco.languages.getLanguages());
+            })
+          }}
+        ></s-monaco-editor>
+      </ThemeProvider>
+    </div>
+  );
+};
+
+function getCommandBarFarItems(
+  { editorLanguage, editorLanguages, setEditorLanguage }: {
+    editorLanguages: languages.ILanguageExtensionPoint[] | undefined,
+    editorLanguage: string,
+    setEditorLanguage: React.Dispatch<React.SetStateAction<string>>
+  }
+) {
+  return [
+    {
+      key: 'language',
+      text: editorLanguages?.find(language => editorLanguage === language.id)?.aliases?.[0] || 'Loading...',
+      subMenuProps: {
+        items: editorLanguages?.map(language => ({
+          key: language.id,
+          text: language.aliases?.[0] || language.id,
+          onClick: () => setEditorLanguage(language.id),
+        })) || []
+      },
+    },
+  ] as ICommandBarItemProps[];
+}
+
+function getCommandBarItems() {
+  return [
     {
       key: 'file',
       text: 'File',
@@ -69,41 +125,5 @@ export const Home: React.FunctionComponent = () => {
         ],
       },
     },
-  ];
-
-  const farItems: ICommandBarItemProps[] = [
-    {
-      key: 'language',
-      text: editorLanguages?.find(language => editorLanguage === language.id)?.aliases?.[0] || 'Loading...',
-      subMenuProps: {
-        items: editorLanguages?.map(language => ({
-          key: language.id,
-          text: language.aliases?.[0] || language.id,
-          onClick: () => setEditorLanguage(language.id),
-        })) || []
-      },
-    },
-  ];
-
-  return (
-    <div id="main-container">
-      <CommandBar
-        id="command-bar"
-        items={items}
-        farItems={farItems}
-        ariaLabel="Use left and right arrow keys to navigate between commands"
-      />
-      <s-monaco-editor
-        id="editor"
-        value={editorValue}
-        language={editorLanguage}
-        ref={el => {
-          el?.addEventListener('componentLoad', event => {
-            const detail = (event as CustomEvent).detail;
-            setEditorLanguages(detail.monaco.languages.getLanguages());
-          })
-        }}
-      ></s-monaco-editor>
-    </div>
-  );
-};
+  ] as ICommandBarItemProps[];
+}
