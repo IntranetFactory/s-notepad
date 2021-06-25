@@ -28,7 +28,7 @@ export const Home: React.FunctionComponent = () => {
   }>();
 
   const { editorLanguage: _editorLanguage, sharedContentBase64 } = useParams<any>();
-  
+
   useEffect(() => {
     window.addEventListener('beforeunload', (event: any) => {
       if (isAnyChangePending) {
@@ -36,7 +36,7 @@ export const Home: React.FunctionComponent = () => {
         event.returnValue = message;
       }
     });
-    
+
     if (sharedContentBase64) {
       const encodedBuffer = base64ToBuffer(sharedContentBase64.replace(/-/g, '/'));
       const inflatedBuffer = pako.inflate(encodedBuffer);
@@ -353,6 +353,7 @@ export const Home: React.FunctionComponent = () => {
         />
         <s-monaco-editor
           id="editor"
+          monaco-vs-path="/monaco-editor/vs"
           value={editorValue}
           language={editorLanguage}
           theme={editorTheme}
