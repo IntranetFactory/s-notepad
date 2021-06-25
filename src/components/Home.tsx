@@ -283,6 +283,36 @@ export const Home: React.FunctionComponent = () => {
               setEditorLanguages(detail.monaco.languages.getLanguages());
             })
           }}
+          onDragOver={(event: any) => event.preventDefault()}
+          onDrop={async (event: any) => {
+            event.preventDefault();
+            for (const item of (event.dataTransfer.items as any)) {
+              if (item.kind === 'file') {
+                const fileHandle = await item.getAsFileSystemHandle();
+                if (fileHandle.kind === 'file') {
+                  await openFile(fileHandle);
+                } else {
+                  setDialogConfig({
+                    dialogProps: {
+                      type: DialogType.normal,
+                      title: 'Unsupported Type',
+                      subText: 'Opening a direcotory is not supported.',
+                    },
+                    modalProps: { isBlocking: true },
+                    buttons: [
+                      {
+                        type: PrimaryButton,
+                        text: 'OK',
+                        handler: () => {
+                          setDialogConfig(undefined);
+                        },
+                      },
+                    ]
+                  });
+                }
+              }
+            }
+          }}
         ></s-monaco-editor>
       </ThemeProvider>
     </div>
