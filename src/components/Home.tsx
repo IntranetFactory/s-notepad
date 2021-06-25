@@ -24,6 +24,13 @@ export const Home: React.FunctionComponent = () => {
   }>();
 
   useEffect(() => {
+    window.addEventListener('beforeunload', (event: any) => {
+      if (isAnyChangePending) {
+        const message = 'You have unsaved changes, are you really sure to close the document?';
+        event.returnValue = message;
+      }
+    });
+
     if ('launchQueue' in window) {
       (window as any)['launchQueue'].setConsumer((launchParams: any) => {
         if (launchParams.files?.length > 0) {
@@ -33,7 +40,7 @@ export const Home: React.FunctionComponent = () => {
         }
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
