@@ -1,4 +1,4 @@
-import { createTheme, PartialTheme } from "@fluentui/react";
+import { createTheme } from "@fluentui/react";
 
 const defaultTheme = 'system';
 
