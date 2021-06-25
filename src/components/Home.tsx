@@ -24,6 +24,19 @@ export const Home: React.FunctionComponent = () => {
   }>();
 
   useEffect(() => {
+    if ('launchQueue' in window) {
+      (window as any)['launchQueue'].setConsumer((launchParams: any) => {
+        if (launchParams.files?.length > 0) {
+          for (const fileHandle of launchParams.files) {
+            openFile(fileHandle);
+          }
+        }
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     applyTheme(getActualTheme());
     addKeyboardShortcuts();
   });
