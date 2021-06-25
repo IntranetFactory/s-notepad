@@ -22,20 +22,6 @@ export function getActualTheme() {
 
 export function setTheme(theme: 'light' | 'dark' | 'system') {
   localStorage.setItem('theme', theme);
-  applyTheme(getActualTheme());
-}
-
-export function applyTheme(theme: 'light' | 'dark') {
-  switch (theme) {
-    case 'light':
-      document.body.classList.toggle('dark', false);
-      (document.body.style as any)['colorScheme'] = 'light';
-      break;
-    case 'dark':
-      document.body.classList.toggle('dark', true);
-      (document.body.style as any)['colorScheme'] = 'dark';
-      break;
-  }
 }
 
 export const fluentLightTheme = createTheme({
@@ -93,14 +79,9 @@ export const fluentDarkTheme = createTheme({
 });
 
 export function getActualFluentTheme() {
-  const theme = getTheme();
-  if (theme === 'system') {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (prefersDark) {
-      return fluentDarkTheme;
-    } else {
-      return fluentLightTheme;
-    }
+  const theme = getActualTheme();
+  if (theme === 'dark') {
+    return fluentDarkTheme;
   } else {
     return fluentLightTheme;
   }

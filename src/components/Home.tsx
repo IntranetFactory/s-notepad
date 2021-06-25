@@ -4,7 +4,7 @@ import mousetrap from 'mousetrap';
 import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { applyTheme, getActualFluentTheme, getActualTheme } from '../utils/theme';
+import { getActualFluentTheme, getActualTheme, setTheme } from '../utils/theme';
 
 import './Home.css';
 
@@ -16,7 +16,7 @@ export const Home: React.FunctionComponent = () => {
   const [editorValue, setEditorValue] = useState<string>('');
   const [editorLanguage, setEditorLanguage] = useState<string>('plaintext');
   const [editorLanguages, setEditorLanguages] = useState<languages.ILanguageExtensionPoint[]>();
-  const [editorTheme] = useState<string>(getActualTheme() === 'light' ? 'vs-light' : 'vs-dark');
+  const [editorTheme, setEditorTheme] = useState<string>(getActualTheme() === 'light' ? 'vs-light' : 'vs-dark');
   const [dialogConfig, setDialogConfig] = useState<{
     dialogProps?: IDialogContentProps,
     modalProps?: IModalProps,
@@ -44,7 +44,6 @@ export const Home: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    applyTheme(getActualTheme());
     addKeyboardShortcuts();
   });
 
@@ -126,6 +125,43 @@ export const Home: React.FunctionComponent = () => {
         key: 'settings',
         text: 'Settings',
         iconProps: { iconName: 'Settings' },
+        subMenuProps: {
+          items: [
+            {
+              key: 'theme',
+              text: 'Theme',
+              iconProps: { iconName: getActualTheme() === 'light' ? 'Sunny' : 'ClearNight' },
+              subMenuProps: {
+                items: [
+                  {
+                    key: 'light',
+                    text: 'Light',
+                    onClick: () => {
+                      setTheme('light');
+                      setEditorTheme('vs-light');
+                    },
+                  },
+                  {
+                    key: 'dark',
+                    text: 'Dark',
+                    onClick: () => {
+                      setTheme('dark');
+                      setEditorTheme('vs-dark');
+                    },
+                  },
+                  {
+                    key: 'system',
+                    text: 'System Default',
+                    onClick: () => {
+                      setTheme('system');
+                      setEditorTheme(`vs-${getActualTheme()}`);
+                    },
+                  },
+                ]
+              }
+            },
+          ]
+        }
       },
       {
         key: 'share',
@@ -255,7 +291,6 @@ export const Home: React.FunctionComponent = () => {
 
     mousetrap.prototype.stopCallback = () => false;
   }
-
 
   return (
     <div id="main-container">
