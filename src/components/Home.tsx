@@ -1,4 +1,4 @@
-import { BaseButton, Button, CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, ICommandBarItemProps, IDialogContentProps, IModalProps, PrimaryButton, ThemeProvider } from '@fluentui/react';
+import { BaseButton, Button, CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, ICommandBarItemProps, IDialogContentProps, IModalProps, PrimaryButton, setLanguage, ThemeProvider } from '@fluentui/react';
 import { languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
 import pako from 'pako';
@@ -214,8 +214,12 @@ export const Home: React.FunctionComponent = () => {
   async function openFile(fileHandle?: any) {
     await alertIfAnyPendingChange(async () => {
       setFileHandle(fileHandle || (await (window as any).showOpenFilePicker())?.[0]);
-      const content = await readFile();
+      const file = await fetchFile();
+      const content = await readFile(file);
+      const fileExtension = `.${file.name.split('.').pop()}`;
       loadContentToEditor(content);
+      const fileLanguage = editorLanguages?.find(lang => lang.extensions?.includes(fileExtension));
+      setEditorLanguage(fileLanguage?.id || 'plaintext');
       setIsAnyChangePending(false);
       isFileJustOpened = true;
     });
@@ -261,8 +265,11 @@ export const Home: React.FunctionComponent = () => {
     }
   }
 
-  async function readFile() {
-    const file = await fileHandle.getFile() as File;
+  async function fetchFile() {
+    return await fileHandle.getFile() as File;
+  }
+
+  async function readFile(file: File) {
     return await file.text();
   }
 
