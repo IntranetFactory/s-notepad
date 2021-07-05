@@ -1,4 +1,4 @@
-import { BaseButton, Button, CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, ICommandBarItemProps, IDialogContentProps, IModalProps, PrimaryButton, setLanguage, ThemeProvider } from '@fluentui/react';
+import { BaseButton, Button, CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, ICommandBarItemProps, IDialogContentProps, IModalProps, PrimaryButton, ThemeProvider } from '@fluentui/react';
 import { languages } from 'monaco-editor';
 import mousetrap from 'mousetrap';
 import pako from 'pako';
