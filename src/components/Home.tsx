@@ -190,12 +190,29 @@ export const Home: React.FunctionComponent = () => {
               key: 'snapshot',
               text: 'Snapshot',
               iconProps: { iconName: 'Camera' },
-              onClick: () => shareSnapshot(),
+              subMenuProps: {
+                items: [
+                  {
+                    key: 'copy',
+                    text: 'Copy',
+                    iconProps: { iconName: 'Copy' },
+                    onClick: () => showSnapshotShareLink(),
+                  },
+                  {
+                    key: 'system-share',
+                    text: 'System Share',
+                    iconProps: { iconName: 'Share' },
+                    onClick: () => shareSnapshotShareLink(),
+                    disabled: !navigator.share,
+                  }
+                ]
+              },
             },
             {
               key: 'embed',
               text: 'Embed',
               iconProps: { iconName: 'Embed' },
+              disabled: true,
             },
           ],
         },
@@ -250,19 +267,27 @@ export const Home: React.FunctionComponent = () => {
     });
   }
 
-  async function shareSnapshot() {
-    const deflatedText = pako.deflate(new TextEncoder().encode(editorValue));
-    const base64String = bufferToBase64(deflatedText).replace(/\//g, '-');
-    const url = `${baseUrl}/snapshot/${editorLanguage || 'plaintext'}/${base64String}`;
+  function showSnapshotShareLink() {
+    const url = generateSnapshotShareLink();
+    prompt('You can copy the link and share it.', url);
+  }
+
+  function shareSnapshotShareLink() {
+    const url = generateSnapshotShareLink();
     if (navigator.share) {
       navigator.share({
         title: document.title,
         text: document.title,
         url
       });
-    } else {
-      prompt('You can copy the link and share it.', url);
     }
+  }
+
+  function generateSnapshotShareLink() {
+    const deflatedText = pako.deflate(new TextEncoder().encode(editorValue));
+    const base64String = bufferToBase64(deflatedText).replace(/\//g, '-');
+    const url = `${baseUrl}/snapshot/${editorLanguage || 'plaintext'}/${base64String}`;
+    return url;
   }
 
   async function fetchFile() {
