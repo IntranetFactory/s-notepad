@@ -127,7 +127,7 @@ export const Home: React.FunctionComponent = () => {
               text: 'Save As',
               secondaryText: 'Ctrl + Shift + S',
               iconProps: { iconName: 'SaveAs' },
-              onClick: () => saveFile(),
+              onClick: () => saveFile(true),
             },
             {
               key: 'exit',
@@ -352,7 +352,7 @@ export const Home: React.FunctionComponent = () => {
     mousetrap.bind(['ctrl+n', 'command+n'], event => executeAction(event, () => createNew()));
     mousetrap.bind(['ctrl+o', 'command+o'], event => executeAction(event, () => openFile()));
     mousetrap.bind(['ctrl+s', 'command+s'], event => executeAction(event, () => saveFile()));
-    mousetrap.bind(['ctrl+shift+s', 'command+shift+s'], event => executeAction(event, () => saveFile()));
+    mousetrap.bind(['ctrl+shift+s', 'command+shift+s'], event => executeAction(event, () => saveFile(true)));
 
     mousetrap.prototype.stopCallback = () => false;
   }
