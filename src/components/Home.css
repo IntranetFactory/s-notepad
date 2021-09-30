@@ -12,5 +12,8 @@
 }
 
 #editor {
+    --command-bar-height: 44px;
+    
     flex: 1 1 auto;
+    height: calc(100% - var(--command-bar-height));
 }
